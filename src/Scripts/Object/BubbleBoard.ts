@@ -10,8 +10,6 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
   private bubbleBoard : Bubble[][];
 
-  private prevBubble : Bubble;
-
   constructor(scene : Phaser.Scene){
     super(scene, "Bubble Board");
     scene.add.existing(this);
@@ -22,13 +20,10 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   }
 
   bubbleAttached(bubble : Bubble){
-    if(this.prevBubble){
-      console.log(this.prevBubble.x);
-    }
-    bubble.attach();
     let posX : number = Math.floor(bubble.x / bubble.body.width);
-    bubble.x = (bubble.body.width/2 + posX * bubble.body.width);
-    this.prevBubble = bubble;
+    let posY = bubble.height/2;
+    this.scene.physics.add.staticSprite((bubble.body.width/2 + posX * bubble.body.width), posY, "bubble").setScale(bubble.scale);
+    bubble.destroy();
   }
 
 }
