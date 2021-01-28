@@ -10,7 +10,7 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite {
       scene.add.existing(this);
       scene.physics.add.existing(this);
 
-      this.setScale(0.7);
+      this.setScale(0.75);
       
       this.setPushable(false);
 
