@@ -3,6 +3,7 @@ import * as Phaser from "phaser";
 import Bubble from "../Object/Bubble";
 import BubbleBoard from "../Object/BubbleBoard";
 import Pointer from "../Object/Pointer"
+import StaticBubble from "../Object/StaticBubble";
 
 export default class GameScene extends Phaser.Scene {
 
@@ -29,9 +30,11 @@ export default class GameScene extends Phaser.Scene {
     this.ballSpawnPoint = new Phaser.Math.Vector2(this.cameras.main.centerX, this.cameras.main.height-200)
 
     this.bubbleBoard = new BubbleBoard(this);
+
     this.pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
     this.pointer.setDisplayOrigin(this.pointer.width/2, this.pointer.height/2 + 100);
-    this.currentBubble = new Bubble(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+
+    this.createNewBall();
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
   }
@@ -49,11 +52,22 @@ export default class GameScene extends Phaser.Scene {
 
     if(!this.isLastDown && this.input.activePointer.isDown){
       this.currentBubble.shoot(this.shootAngle);
-      this.currentBubble = new Bubble(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+      this.createNewBall();
     }
 
     this.isLastDown = this.input.activePointer.isDown;
 
+  }
+
+  private createNewBall() : void {
+    this.currentBubble = new Bubble(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+    this.physics.add.collider(this.currentBubble, this.bubbleBoard.getStaticGroup(), this.onBallCollision, null, this);
+  }
+
+  private onBallCollision(obj1 : Phaser.GameObjects.GameObject, obj2 : Phaser.GameObjects.GameObject){
+    if(obj1 instanceof Bubble && obj1.body != null){
+      this.bubbleBoard.bubbleAttached(obj1 as Bubble);
+    }
   }
 
   private updateShootAngle() : void {
