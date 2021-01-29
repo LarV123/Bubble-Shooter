@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 import Bubble from "../Object/Bubble";
-import BubbleFactory from "../Interfaces/BubbleFactory";
+import {BubbleFactory} from "../Interfaces/BubbleFactory";
 import Pointer from "../Object/Pointer";
 
 export default class ShootControl {

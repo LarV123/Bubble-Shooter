@@ -6,6 +6,7 @@ import Pointer from "../Object/Pointer"
 import ShootControl from "../Control/ShootControl";
 import BubbleSpawner from "../Control/BubbleSpawner";
 import {BubbleFactory, BubbleCreatedCallback} from "../Interfaces/BubbleFactory";
+import ColorControl from "../Control/ColorControl";
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -15,6 +16,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   private shootControl : ShootControl;
 
   private isLastDown : boolean = false;
+
+  private colorControl : ColorControl;
 
   constructor() {
     super({ key: "GameScene" });
@@ -30,13 +33,15 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
     this.bubbleBoard = new BubbleBoard(this);
 
+    this.colorControl = new ColorControl(this);
+
     this.shootControl = new ShootControl(this.createBubbleFactory(), this.createPointer());
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
   }
 
   private createBubbleFactory() : BubbleFactory{
-    let bubbleSpawner : BubbleSpawner = new BubbleSpawner(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+    let bubbleSpawner : BubbleSpawner = new BubbleSpawner(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.colorControl);
     bubbleSpawner.addCreateListener(this);
     return bubbleSpawner;
   }
@@ -55,6 +60,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   update(): void {
+    this.colorControl.update();
     this.shootControl.update(this.input.x, this.input.y);
     if(!this.isLastDown && this.input.activePointer.isDown){
       this.shootControl.shoot();

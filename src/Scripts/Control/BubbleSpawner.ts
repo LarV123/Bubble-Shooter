@@ -1,18 +1,18 @@
 import * as Phaser from "phaser";
 import {BubbleFactory, BubbleCreatedCallback} from "../Interfaces/BubbleFactory";
 import Bubble from "../Object/Bubble";
-import ColorRandomizer from "../Interfaces/ColorRandomizer";
+import ColorGenerator from "../Interfaces/ColorGenerator";
 
 export default class BubbleSpawner implements BubbleFactory{
 
   private scene : Phaser.Scene;
-  private colorRandomizer : ColorRandomizer;
+  private colorRandomizer : ColorGenerator;
   private callbackList : BubbleCreatedCallback[];
 
   private spawnX : number;
   private spawnY : number;
 
-  constructor(scene : Phaser.Scene, spawnX : number, spawnY : number, colorRandomizer? : ColorRandomizer){
+  constructor(scene : Phaser.Scene, spawnX : number, spawnY : number, colorRandomizer? : ColorGenerator){
     this.scene = scene;
     this.colorRandomizer = colorRandomizer;
     this.spawnX = spawnX;
