@@ -56,7 +56,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     while(indexY >= this.bubbleBoard.length){
       this.bubbleBoard.push(new Array<StaticBubble>(this.arrayLength[indexY % 2]));
     }
-    this.bubbleBoard[indexY][indexX] = new StaticBubble(this.scene, posX, posY);
+    this.bubbleBoard[indexY][indexX] = new StaticBubble(this.scene, posX, posY, bubble.getColor());
     this.group.add(this.bubbleBoard[indexY][indexX]);
     bubble.destroy();
   }

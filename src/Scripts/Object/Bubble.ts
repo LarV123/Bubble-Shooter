@@ -4,12 +4,15 @@ export default class Bubble extends Phaser.Physics.Arcade.Image {
 
   private speed : number = 900;
 
+  private color : number;
+
   constructor(scene : Phaser.Scene, x : number, y : number, color? : number){
     super(scene, x, y, "bubble");
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    this.color = color;
     this.setTint(color);
 
     this.setScale(0.75);
@@ -34,6 +37,10 @@ export default class Bubble extends Phaser.Physics.Arcade.Image {
     this.setCollideWorldBounds(false);
     (this.body as Phaser.Physics.Arcade.Body).onWorldBounds = false;
     return this;
+  }
+
+  getColor() : number {
+    return this.color;
   }
 
 }
