@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import ColorGenerator from "../Interfaces/ColorGenerator";
+import Random from "../Util/Random";
 
 export default class ColorControl implements ColorGenerator{
 
@@ -30,7 +31,7 @@ export default class ColorControl implements ColorGenerator{
   }
 
   generateColor() : number{
-    return this.colors[this.index];
+    return this.colors[Random.getRandomInteger(0, this.colors.length)];
   }
 
 }

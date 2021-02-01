@@ -32,7 +32,9 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
     this.popper = new BubbleRecursivePopper(this);
 
-    this.generateRowOfBubble(0);
+    for(let i : number = 0; i < 5; i++){
+      this.generateRowOfBubble(i);
+    }
   }
 
   private generateRowOfBubble(indexY : number) : void{
