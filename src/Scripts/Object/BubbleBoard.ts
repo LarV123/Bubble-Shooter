@@ -3,8 +3,9 @@ import DynamicBubble from "./Bubble/DynamicBubble";
 import StaticBubble from "./Bubble/StaticBubble";
 import {BUBBLE_RADIUS} from "./Bubble/Bubble";
 import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
-import BubbleRecursivePopper from "../Control/BubbleRecursivePopper";
+import ConnectedColorBubblePopper from "../Control/ConnectedColorBubblePopper";
 import BubblePopper from "../Interfaces/BubblePopper";
+import HangingBubbleCleaner from "../Control/HangingBubbleCleaner";
 
 export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
@@ -18,7 +19,8 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   private arrayLength : number[];
 
   private staticBubbleFactory : StaticBubbleFactory;
-  private popper : BubblePopper;
+  private sameColorPopper : BubblePopper;
+  private hangingBubbleCleaner : HangingBubbleCleaner;
 
   constructor(scene : Phaser.Scene, staticBubbleFactory : StaticBubbleFactory){
     super(scene, "Bubble Board");
@@ -30,7 +32,8 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
     this.group = scene.physics.add.staticGroup();
 
-    this.popper = new BubbleRecursivePopper(this);
+    this.sameColorPopper = new ConnectedColorBubblePopper(this);
+    this.hangingBubbleCleaner = new HangingBubbleCleaner(this);
 
     for(let i : number = 0; i < 5; i++){
       this.generateRowOfBubble(i);
@@ -59,6 +62,10 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     }
     this.bubbleBoard[indexY][indexX].destroy();
     this.bubbleBoard[indexY][indexX] = null;
+  }
+
+  popHangingBubble(){
+    this.hangingBubbleCleaner.clean();
   }
 
   cleanBubbleBoard(){
@@ -115,7 +122,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     let posY : number = this.calculatePosY(indexY);
     this.insert(new StaticBubble(this.scene, posX, posY, bubble.getColor()), indexX, indexY);
     bubble.destroy();
-    this.popper.pop(indexX, indexY);
+    this.sameColorPopper.pop(indexX, indexY);
   }
 
   getStaticGroup() : Phaser.Physics.Arcade.StaticGroup {
