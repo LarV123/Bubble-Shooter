@@ -1,12 +1,12 @@
 import * as Phaser from "phaser";
-import Bubble from "../Object/Bubble";
-import {BubbleFactory} from "../Interfaces/BubbleFactory";
+import DynamicBubble from "../Object/Bubble/DynamicBubble";
+import DynamicBubbleFactory from "../Interfaces/DynamicBubbleFactory";
 import Pointer from "../Object/Pointer";
 
 export default class ShootControl {
 
-  private currentBubble : Bubble;
-  private bubbleFactory : BubbleFactory;
+  private currentBubble : DynamicBubble;
+  private bubbleFactory : DynamicBubbleFactory;
   
   private shootAngle : number;
 
@@ -15,7 +15,7 @@ export default class ShootControl {
   private mouseX : number;
   private mouseY : number;
 
-  constructor(bubbleFactory : BubbleFactory, pointer : Pointer){
+  constructor(bubbleFactory : DynamicBubbleFactory, pointer : Pointer){
     this.bubbleFactory = bubbleFactory;
     this.pointer = pointer;
     this.createBubble();
@@ -27,7 +27,7 @@ export default class ShootControl {
   }
 
   private createBubble() : void{
-    this.currentBubble = this.bubbleFactory.createBubble();
+    this.currentBubble = this.bubbleFactory.createDynamicBubble();
   }
 
   update(mouseX : number, mouseY : number) : void{

@@ -16,7 +16,7 @@ export default class ColorControl implements ColorGenerator{
   constructor(scene : Phaser.Scene){
     this.scene = scene;
     this.keySpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, true);
-    this.colors = [0xff0000, 0x00ff00, 0x0000ff];
+    this.colors = [0xff5e5e, 0x5e9cff, 0x5eff73];
   }
 
   update() : void{

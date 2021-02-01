@@ -1,6 +1,10 @@
 import * as Phaser from "phaser";
-import Bubble from "./Bubble";
-import StaticBubble from "./StaticBubble";
+import DynamicBubble from "./Bubble/DynamicBubble";
+import StaticBubble from "./Bubble/StaticBubble";
+import {BUBBLE_RADIUS} from "./Bubble/Bubble";
+import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
+import BubbleRecursivePopper from "../Control/BubbleRecursivePopper";
+import BubblePopper from "../Interfaces/BubblePopper";
 
 export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
@@ -13,57 +17,49 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   //1 for odd
   private arrayLength : number[];
 
-  constructor(scene : Phaser.Scene){
+  private staticBubbleFactory : StaticBubbleFactory;
+  private popper : BubblePopper;
+
+  constructor(scene : Phaser.Scene, staticBubbleFactory : StaticBubbleFactory){
     super(scene, "Bubble Board");
     scene.add.existing(this);
     this.bubbleBoard = [];
+    this.staticBubbleFactory = staticBubbleFactory;
 
     this.arrayLength = [8, 7];
 
     this.group = scene.physics.add.staticGroup();
+
+    this.popper = new BubbleRecursivePopper(this);
+
+    this.generateRowOfBubble(0);
   }
 
-  private getIndexX(indexY : number, bubble : Bubble) : number{
-    if(this.arrayLength[indexY%2] == 7){
-      bubble.x -= bubble.body.width/2;
-    }
-    return Math.floor(bubble.x / bubble.body.width);
-  }
-
-  private getIndexY(bubble : Bubble) : number{
-    return Math.floor(bubble.y / (bubble.body.height * Math.sqrt(3/4)));
-  }
-
-  private calculatePosX(indexX : number, indexY : number, bubble : Bubble) : number{
-    if(this.arrayLength[indexY % 2] == 8){
-      return bubble.body.width/2 + indexX * bubble.body.width;
-    }else{
-      return bubble.body.width + indexX * bubble.body.width;
+  private generateRowOfBubble(indexY : number) : void{
+    for(let i:number = 0; i < this.arrayLength[indexY%2]; i++){
+      let staticBubble : StaticBubble = this.staticBubbleFactory.createStaticBubble(this.calculatePosX(i, indexY), this.calculatePosY(indexY));
+      this.insert(staticBubble, i, indexY);
     }
   }
 
-  private calculatePosY(indexX : number, indexY : number, bubble : Bubble) : number{
-    return bubble.body.height/2 + indexY * bubble.body.height * Math.sqrt(3/4);
+  insert(staticBubble : StaticBubble, indexX : number, indexY : number) : void{
+    this.remove(indexX, indexY);
+    while(indexY >= this.bubbleBoard.length){
+      this.bubbleBoard.push(new Array<StaticBubble>(this.arrayLength[indexY % 2]));
+    }
+    this.bubbleBoard[indexY][indexX] = staticBubble;
+    this.group.add(this.bubbleBoard[indexY][indexX]);
   }
 
-  private isOutOfBound(indexX : number, indexY : number) : boolean{
-    if(indexY < 0 || indexY >= this.bubbleBoard.length || indexX < 0 || indexX >= this.bubbleBoard[indexY].length){
-      return true;
+  remove(indexX : number, indexY : number) : void{
+    if(this.isOutOfBound(indexX, indexY) || this.bubbleBoard[indexY][indexX] == null){
+      return;
     }
+    this.bubbleBoard[indexY][indexX].destroy();
+    this.bubbleBoard[indexY][indexX] = null;
   }
 
-  private startPopCheck(indexX : number, indexY : number, color : number) : void {
-    let bubbleList : StaticBubble[] = [];
-    let indexList : number[][] = [];
-    this.popCheck(indexX, indexY, color, bubbleList, indexList);
-    if(bubbleList.length >= 3){
-      for(let i:number = 0; i < bubbleList.length; i++){
-        let x : number = indexList[i][0];
-        let y : number = indexList[i][1];
-        this.bubbleBoard[y][x] = null;
-        bubbleList[i].destroy();
-      }
-    }
+  cleanBubbleBoard(){
     let count : number = this.bubbleBoard.length - 1;
     while(count >= 0){
       let isAllNull = true;
@@ -81,45 +77,51 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     }
   }
 
-  private neighbourCellOdd : number[][] = [[0, -1], [1, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
-  private neighbourCellEven : number[][] = [[-1, -1], [0, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
-  private popCheck(indexX : number, indexY : number, color : number, bubbleList : StaticBubble[], indexList : number[][]) : void{
-    if(this.isOutOfBound(indexX, indexY)){
-      return;
+  private getIndexX(indexY : number, bubble : DynamicBubble) : number{
+    if(this.arrayLength[indexY%2] == 7){
+      bubble.x -= bubble.body.width/2;
     }
-    let curBubble : StaticBubble = this.bubbleBoard[indexY][indexX];
-    if(curBubble == null || curBubble.getColor() != color || bubbleList.indexOf(curBubble) != -1){
-      return;
-    }
-    bubbleList.push(curBubble);
-    indexList.push([indexX, indexY]);
-    if(indexY % 2 == 0){
-      this.neighbourCellEven.forEach(offset => {
-        this.popCheck(indexX + offset[0], indexY + offset[1], color, bubbleList, indexList);
-      });
+    return Math.floor(bubble.x / bubble.body.width);
+  }
+
+  private getIndexY(bubble : DynamicBubble) : number{
+    return Math.floor(bubble.y / (bubble.body.height * Math.sqrt(3/4)));
+  }
+
+  private calculatePosX(indexX : number, indexY : number) : number{
+    if(this.arrayLength[indexY % 2] == 8){
+      return BUBBLE_RADIUS + indexX * BUBBLE_RADIUS * 2;
     }else{
-      this.neighbourCellOdd.forEach(offset => {
-        this.popCheck(indexX + offset[0], indexY + offset[1], color, bubbleList, indexList);
-      });
+      return BUBBLE_RADIUS * 2 + indexX * BUBBLE_RADIUS * 2;
     }
   }
 
-  bubbleAttached(bubble : Bubble){
+  private calculatePosY(indexY : number) : number{
+    return BUBBLE_RADIUS + indexY * BUBBLE_RADIUS * 2 * Math.sqrt(3/4);
+  }
+
+  isOutOfBound(indexX : number, indexY : number) : boolean{
+    if(indexY < 0 || indexY >= this.bubbleBoard.length || indexX < 0 || indexX >= this.bubbleBoard[indexY].length){
+      return true;
+    }
+  }
+
+  attach(bubble : DynamicBubble){
     let indexY : number = this.getIndexY(bubble);
     let indexX : number = this.getIndexX(indexY, bubble);
-    let posX : number = this.calculatePosX(indexX, indexY, bubble);
-    let posY : number = this.calculatePosY(indexX, indexY, bubble);
-    while(indexY >= this.bubbleBoard.length){
-      this.bubbleBoard.push(new Array<StaticBubble>(this.arrayLength[indexY % 2]));
-    }
-    this.bubbleBoard[indexY][indexX] = new StaticBubble(this.scene, posX, posY, bubble.getColor());
-    this.group.add(this.bubbleBoard[indexY][indexX]);
-    this.startPopCheck(indexX, indexY, bubble.getColor());
+    let posX : number = this.calculatePosX(indexX, indexY);
+    let posY : number = this.calculatePosY(indexY);
+    this.insert(new StaticBubble(this.scene, posX, posY, bubble.getColor()), indexX, indexY);
     bubble.destroy();
+    this.popper.pop(indexX, indexY);
   }
 
   getStaticGroup() : Phaser.Physics.Arcade.StaticGroup {
     return this.group;
+  }
+
+  getBubbleBoard() : ReadonlyArray<ReadonlyArray<StaticBubble>> {
+    return this.bubbleBoard;
   }
 
 }

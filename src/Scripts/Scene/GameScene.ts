@@ -1,12 +1,15 @@
 import { Vector } from "matter";
 import * as Phaser from "phaser";
-import Bubble from "../Object/Bubble";
+import DynamicBubble from "../Object/Bubble/DynamicBubble";
 import BubbleBoard from "../Object/BubbleBoard";
 import Pointer from "../Object/Pointer"
 import ShootControl from "../Control/ShootControl";
-import BubbleSpawner from "../Control/BubbleSpawner";
-import {BubbleFactory, BubbleCreatedCallback} from "../Interfaces/BubbleFactory";
+import DynamicBubbleCreator from "../Control/DynamicBubbleCreator";
+import DynamicBubbleFactory from "../Interfaces/DynamicBubbleFactory";
+import BubbleCreatedCallback from "../Interfaces/BubbleCreatedCallback";
 import ColorControl from "../Control/ColorControl";
+import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
+import StaticBubbleCreator from "../Control/StaticBubbleCreator";
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -31,17 +34,22 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
     this.ballSpawnPoint = new Phaser.Math.Vector2(this.cameras.main.centerX, this.cameras.main.height-200)
 
-    this.bubbleBoard = new BubbleBoard(this);
-
     this.colorControl = new ColorControl(this);
 
-    this.shootControl = new ShootControl(this.createBubbleFactory(), this.createPointer());
+    this.bubbleBoard = new BubbleBoard(this, this.createStaticBubbleFactory());
+
+    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer());
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
   }
 
-  private createBubbleFactory() : BubbleFactory{
-    let bubbleSpawner : BubbleSpawner = new BubbleSpawner(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.colorControl);
+  private createStaticBubbleFactory() : StaticBubbleFactory {
+    let bubbleCreator : StaticBubbleCreator = new StaticBubbleCreator(this, 0, 0, this.colorControl);
+    return bubbleCreator;
+  }
+
+  private createDynamicBubbleFactory() : DynamicBubbleFactory{
+    let bubbleSpawner : DynamicBubbleCreator = new DynamicBubbleCreator(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.colorControl);
     bubbleSpawner.addCreateListener(this);
     return bubbleSpawner;
   }
@@ -53,9 +61,9 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   private onWorldBound(body : Phaser.Physics.Arcade.Body, topCollision : boolean) : void{
-    if(topCollision && body.gameObject instanceof Bubble){
-      let bubble : Bubble = (body.gameObject as Bubble);
-      this.bubbleBoard.bubbleAttached(bubble);
+    if(topCollision && body.gameObject instanceof DynamicBubble){
+      let bubble : DynamicBubble = (body.gameObject as DynamicBubble);
+      this.bubbleBoard.attach(bubble);
     }
   }
 
@@ -68,13 +76,13 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.isLastDown = this.input.activePointer.isDown;
   }
 
-  onBubbleCreated(bubble: Bubble): void {
+  onBubbleCreated(bubble: DynamicBubble): void {
     this.physics.add.collider(bubble, this.bubbleBoard.getStaticGroup(), this.onBallCollision, null, this);
   }
 
   private onBallCollision(obj1 : Phaser.GameObjects.GameObject, obj2 : Phaser.GameObjects.GameObject){
-    if(obj1 instanceof Bubble && obj1.body != null){
-      this.bubbleBoard.bubbleAttached(obj1 as Bubble);
+    if(obj1 instanceof DynamicBubble && obj1.body != null){
+      this.bubbleBoard.attach(obj1 as DynamicBubble);
     }
   }
 
