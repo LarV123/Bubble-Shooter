@@ -3,6 +3,8 @@ import Bubble from "./Bubble";
 
 export default class StaticBubble extends Bubble{
 
+  private endAnim : Phaser.GameObjects.GameObject;
+
   constructor(scene : Phaser.Scene, x : number, y : number, color? : number){
     super(scene, x, y, color);
 
@@ -13,6 +15,28 @@ export default class StaticBubble extends Bubble{
     this.setCircle(this.displayWidth/2 - resize/2);
     this.setOffset(resize/2);
     this.setPushable(false);
+    this.on("animationcomplete", this.popAnimationComplete, this);
+  }
+
+  pop() : void{
+    this.endAnim = this.scene.add.sprite(this.x, this.y, "bubble").setScale(this.scaleX).setTint(this.getColor()).play("bubble_pop").on("animationcomplete", this.popAnimationComplete, this);
+    this.destroy();
+  }
+
+  fall() : void{
+    this.endAnim = this.scene.physics.add.sprite(this.x, this.y, "bubble").setScale(this.scaleX).setTint(this.getColor()).setGravityY(1000);
+    this.scene.tweens.add({
+      targets: this.endAnim,
+      duration: 800,
+      alpha: { getStart: () => 1, getEnd: () => 0},
+      loop:-1
+    });
+    this.scene.time.addEvent({delay: 800, callback:this.popAnimationComplete, callbackScope:this});
+    this.destroy();
+  }
+
+  popAnimationComplete() : void{
+    this.endAnim.destroy();
   }
 
 }

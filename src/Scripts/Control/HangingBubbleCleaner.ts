@@ -31,7 +31,7 @@ export default class HangingBubbleCleaner {
       for(let j = 0; j < this.floodFillArray[i].length; j++){
         str += this.floodFillArray[i][j];
         if(!this.floodFillArray[i][j]){
-          this.connectedBubblePopper.pop(j, i);
+          this.connectedBubblePopper.pop(j, i, "fall");
         }
       }
     }

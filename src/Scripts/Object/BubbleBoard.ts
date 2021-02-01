@@ -60,7 +60,15 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     if(this.isOutOfBound(indexX, indexY) || this.bubbleBoard[indexY][indexX] == null){
       return;
     }
-    this.bubbleBoard[indexY][indexX].destroy();
+    if(anim){
+      if(anim == "fall"){
+        this.bubbleBoard[indexY][indexX].fall();
+      }else{
+        this.bubbleBoard[indexY][indexX].pop();
+      }
+    }else{
+      this.bubbleBoard[indexY][indexX].pop();
+    }
     this.bubbleBoard[indexY][indexX] = null;
   }
 

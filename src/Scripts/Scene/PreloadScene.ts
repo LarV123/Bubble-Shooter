@@ -12,6 +12,7 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.anims.create({key:"bubble_pop", frames:this.anims.generateFrameNumbers("bubble", {start : 1, end : 5}), frameRate : 30, repeat : 0});
     this.scene.start("GameScene");
   }
 }
