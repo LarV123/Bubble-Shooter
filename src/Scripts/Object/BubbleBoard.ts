@@ -56,7 +56,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     this.group.add(this.bubbleBoard[indexY][indexX]);
   }
 
-  remove(indexX : number, indexY : number) : void{
+  remove(indexX : number, indexY : number, anim ? : string) : void{
     if(this.isOutOfBound(indexX, indexY) || this.bubbleBoard[indexY][indexX] == null){
       return;
     }

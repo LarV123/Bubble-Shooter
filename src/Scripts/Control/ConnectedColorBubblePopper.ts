@@ -17,7 +17,7 @@ export default class ConnectedColorBubblePopper implements BubblePopper{
     this.bubbleList = [];
   }
 
-  pop(indexX : number, indexY : number){
+  pop(indexX : number, indexY : number, anim ? : string){
     this.popList = [];
     this.bubbleList = [];
     this.color = this.bubbleBoard.getBubbleBoard()[indexY][indexX].getColor();

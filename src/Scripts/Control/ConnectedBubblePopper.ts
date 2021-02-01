@@ -16,19 +16,19 @@ export default class ConnectedBubblePopper implements BubblePopper{
     this.bubbleList = [];
   }
 
-  pop(indexX : number, indexY : number){
+  pop(indexX : number, indexY : number, anim ? : string){
     this.popList = [];
     this.bubbleList = [];
     this.popCheck(indexX, indexY);
     for(let i : number = 0; i < this.popList.length; i++){
       let x : number = this.popList[i].indexX;
       let y : number = this.popList[i].indexY;
-      this.bubbleBoard.remove(x, y);
+      this.bubbleBoard.remove(x, y, anim);
     }
     this.bubbleBoard.cleanBubbleBoard();
   }
 
-  private neighbourCellOdd : number[][] = [[0, -1], [1, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
+  private neighbourCellOdd : number[][] = [[1, -1], [1, 0], [1, 1], [0, 1], [-1, 0], [0, -1]];
   private neighbourCellEven : number[][] = [[-1, -1], [0, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
   private popCheck(indexX : number, indexY : number) : void{
     if(this.bubbleBoard.isOutOfBound(indexX, indexY)){

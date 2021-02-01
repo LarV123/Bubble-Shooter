@@ -34,7 +34,6 @@ export default class HangingBubbleCleaner {
           this.connectedBubblePopper.pop(j, i);
         }
       }
-      console.log(str);
     }
   }
 
@@ -50,7 +49,6 @@ export default class HangingBubbleCleaner {
     if(this.floodFillArray[indexY][indexX]){
       return;
     }
-    console.log("a");
     this.floodFillArray[indexY][indexX] = true;
     if(indexY % 2 == 0){
       this.neighbourCellEven.forEach(offset => {
