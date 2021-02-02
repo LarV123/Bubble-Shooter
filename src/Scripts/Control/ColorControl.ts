@@ -7,13 +7,23 @@ export default class ColorControl implements ColorGenerator {
 
   private bubbleBoard : BubbleBoard;
 
+  private nextColor : number;
+  private curColor : number;
+
   constructor( bubbleBoard : BubbleBoard){
     this.bubbleBoard = bubbleBoard;
+    this.generateColor();
+  }
+
+  getNextColor() : number{
+    return this.nextColor;
   }
 
   generateColor(): number {
     let colors : number[] = this.bubbleBoard.getAllColorInBoard();
-    return colors[Random.getRandomInteger(0, colors.length)];
+    let curColor : number = this.nextColor;
+    this.nextColor = colors[Random.getRandomInteger(0, colors.length)];
+    return curColor;
   }
 
 }

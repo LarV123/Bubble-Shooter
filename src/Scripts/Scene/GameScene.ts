@@ -6,11 +6,11 @@ import ShootControl from "../Control/ShootControl";
 import DynamicBubbleCreator from "../Control/DynamicBubbleCreator";
 import DynamicBubbleFactory from "../Interfaces/DynamicBubbleFactory";
 import BubbleCreatedCallback from "../Interfaces/BubbleCreatedCallback";
-import ColorGenerator from "../Interfaces/ColorGenerator";
 import ColorControl from "../Control/ColorControl";
 import ColorRandomizer from "../Control/ColorRandomizer";
 import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
 import StaticBubbleCreator from "../Control/StaticBubbleCreator";
+import HUD from "../Object/HUD";
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -18,11 +18,14 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   private ballSpawnPoint : Phaser.Math.Vector2;
 
   private shootControl : ShootControl;
+  private colorControl : ColorControl;
 
   private isLastDown : boolean = false;
 
   private isKeyDown : boolean = false;
   private keySpace : Phaser.Input.Keyboard.Key;
+
+  private hud : HUD;
 
   constructor() {
     super({ key: "GameScene" });
@@ -37,8 +40,12 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.ballSpawnPoint = new Phaser.Math.Vector2(this.cameras.main.centerX, this.cameras.main.height-200);
 
     this.bubbleBoard = new BubbleBoard(this, this.createStaticBubbleFactory());
+    
+    this.colorControl = new ColorControl(this.bubbleBoard);
 
-    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer(), this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+    this.hud = new HUD(this, this.colorControl);
+
+    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer());
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
 
@@ -51,7 +58,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   private createDynamicBubbleFactory() : DynamicBubbleFactory{
-    let bubbleSpawner : DynamicBubbleCreator = new DynamicBubbleCreator(this, this.ballSpawnPoint.x+100, this.ballSpawnPoint.y+100, new ColorControl(this.bubbleBoard));
+    let bubbleSpawner : DynamicBubbleCreator = new DynamicBubbleCreator(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.colorControl);
     bubbleSpawner.addCreateListener(this);
     return bubbleSpawner;
   }
@@ -70,6 +77,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   update(): void {
+    this.hud.update();
     this.shootControl.update(this.input.x, this.input.y);
     if(!this.isLastDown && this.input.activePointer.isDown){
       this.shootControl.shoot();
