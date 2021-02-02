@@ -5,6 +5,7 @@ import Pointer from "../Object/Pointer";
 
 export default class ShootControl {
 
+  private nextBubble : DynamicBubble;
   private currentBubble : DynamicBubble;
   private bubbleFactory : DynamicBubbleFactory;
   
@@ -15,9 +16,15 @@ export default class ShootControl {
   private mouseX : number;
   private mouseY : number;
 
-  constructor(bubbleFactory : DynamicBubbleFactory, pointer : Pointer){
+  private shootPosX : number;
+  private shootPosY : number;
+
+  constructor(bubbleFactory : DynamicBubbleFactory, pointer : Pointer, shootPosX : number, shootPosY : number){
     this.bubbleFactory = bubbleFactory;
     this.pointer = pointer;
+    this.shootPosX = shootPosX;
+    this.shootPosY = shootPosY;
+    this.nextBubble = this.bubbleFactory.createDynamicBubble();
     this.createBubble();
   }
 
@@ -27,7 +34,10 @@ export default class ShootControl {
   }
 
   private createBubble() : void{
-    this.currentBubble = this.bubbleFactory.createDynamicBubble();
+    this.currentBubble = this.nextBubble;
+    this.currentBubble.x = this.shootPosX;
+    this.currentBubble.y = this.shootPosY;
+    this.nextBubble = this.bubbleFactory.createDynamicBubble();
   }
 
   update(mouseX : number, mouseY : number) : void{

@@ -38,7 +38,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
     this.bubbleBoard = new BubbleBoard(this, this.createStaticBubbleFactory());
 
-    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer());
+    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer(), this.ballSpawnPoint.x, this.ballSpawnPoint.y);
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
 
@@ -51,7 +51,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   private createDynamicBubbleFactory() : DynamicBubbleFactory{
-    let bubbleSpawner : DynamicBubbleCreator = new DynamicBubbleCreator(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, new ColorControl(this.bubbleBoard));
+    let bubbleSpawner : DynamicBubbleCreator = new DynamicBubbleCreator(this, this.ballSpawnPoint.x+100, this.ballSpawnPoint.y+100, new ColorControl(this.bubbleBoard));
     bubbleSpawner.addCreateListener(this);
     return bubbleSpawner;
   }
