@@ -157,7 +157,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     if(this.arrayLength[indexY%2] == 7){
       bubble.x -= bubble.body.width/2;
     }
-    return Math.floor(bubble.x / bubble.body.width);
+    return Math.max(Math.floor(bubble.x / bubble.body.width), this.arrayLength[indexY%2]);
   }
 
   private getIndexY(bubble : DynamicBubble) : number{
