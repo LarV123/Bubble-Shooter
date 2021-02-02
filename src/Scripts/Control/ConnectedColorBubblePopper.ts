@@ -32,7 +32,7 @@ export default class ConnectedColorBubblePopper implements BubblePopper{
     this.bubbleBoard.popHangingBubble();
     this.bubbleBoard.cleanBubbleBoard();
   }
-
+ 
   private popCheck(indexX : number, indexY : number) : void{
     if(this.bubbleBoard.isOutOfBound(indexX, indexY)){
       return;
