@@ -37,8 +37,6 @@ export default class HangingBubbleCleaner {
     }
   }
 
-  private neighbourCellOdd : number[][] = [[1, -1], [1, 0], [1, 1], [0, 1], [-1, 0], [0, -1]];
-  private neighbourCellEven : number[][] = [[-1, -1], [0, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
   private floodFill(indexX : number, indexY : number) : void{
     if(indexY < 0 || indexY >= this.floodFillArray.length || indexX < 0 || indexX >= this.floodFillArray[indexY].length){
       return;
@@ -50,15 +48,10 @@ export default class HangingBubbleCleaner {
       return;
     }
     this.floodFillArray[indexY][indexX] = true;
-    if(indexY % 2 == 0){
-      this.neighbourCellEven.forEach(offset => {
-        this.floodFill(indexX + offset[0], indexY + offset[1]);
-      });
-    }else{
-      this.neighbourCellOdd.forEach(offset => {
-        this.floodFill(indexX + offset[0], indexY + offset[1]);
-      });
-    }
+    let neighbourCell : number[][] = this.bubbleBoard.getNeighbourCell(indexX, indexY);
+    neighbourCell.forEach(offset => {
+      this.floodFill(indexX + offset[0], indexY + offset[1]);
+    });
   }
 
 }

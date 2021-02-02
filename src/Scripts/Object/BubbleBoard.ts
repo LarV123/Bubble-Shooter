@@ -9,7 +9,7 @@ import HangingBubbleCleaner from "../Control/HangingBubbleCleaner";
 
 export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
-  private group : Phaser.Physics.Arcade.StaticGroup;
+  private group : Phaser.Physics.Arcade.Group;
 
   private bubbleBoard : StaticBubble[][];
 
@@ -28,15 +28,14 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     this.bubbleBoard = [];
     this.staticBubbleFactory = staticBubbleFactory;
 
-    this.arrayLength = [8, 7];
+    this.arrayLength = [7, 8];
 
-    this.group = scene.physics.add.staticGroup();
-
+    this.group = scene.physics.add.group({immovable:true});
     this.sameColorPopper = new ConnectedColorBubblePopper(this);
     this.hangingBubbleCleaner = new HangingBubbleCleaner(this);
 
     for(let i : number = 0; i < 5; i++){
-      this.generateRowOfBubble(i);
+      this.shiftDown();
     }
   }
 
@@ -45,6 +44,27 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
       let staticBubble : StaticBubble = this.staticBubbleFactory.createStaticBubble(this.calculatePosX(i, indexY), this.calculatePosY(indexY));
       this.insert(staticBubble, i, indexY);
     }
+  }
+
+  shiftDown() : void {
+    this.bubbleBoard.unshift([]);
+    this.swapArrayLength();
+    for(let i = 0; i < this.bubbleBoard.length; i++){
+      for(let j = 0; j < this.bubbleBoard[i].length; j++){
+        if(this.bubbleBoard[i][j] != null){
+          this.bubbleBoard[i][j].x = this.calculatePosX(j, i);
+          this.bubbleBoard[i][j].y = this.calculatePosY(i);
+        }
+      }
+    }
+    this.generateRowOfBubble(0);
+    this.printBoard();
+  }
+
+  private swapArrayLength() : void{
+    let num : number = this.arrayLength[0];
+    this.arrayLength[0] = this.arrayLength[1];
+    this.arrayLength[1] = num;
   }
 
   insert(staticBubble : StaticBubble, indexX : number, indexY : number) : void{
@@ -123,17 +143,41 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     }
   }
 
+  getNeighbourCell(indexX : number, indexY : number){
+    if(this.arrayLength[indexY%2] == 8){
+      return [[-1, -1], [0, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
+    }else{
+      return [[1, -1], [1, 0], [1, 1], [0, 1], [-1, 0], [0, -1]];
+    }
+  }
+
+  private printBoard() :void{
+    console.clear();
+    for(let i = 0; i < this.bubbleBoard.length; i++){
+      let str="";
+      for(let j = 0; j < this.bubbleBoard[i].length; j++){
+        if(this.bubbleBoard[i][j]){
+          str += "O";
+        }else{
+          str += "X";
+        }
+      }
+      console.log(str);
+    }
+  }
+
   attach(bubble : DynamicBubble){
     let indexY : number = this.getIndexY(bubble);
     let indexX : number = this.getIndexX(indexY, bubble);
     let posX : number = this.calculatePosX(indexX, indexY);
     let posY : number = this.calculatePosY(indexY);
     this.insert(new StaticBubble(this.scene, posX, posY, bubble.getColor()), indexX, indexY);
+    this.printBoard();
     bubble.destroy();
     this.sameColorPopper.pop(indexX, indexY);
   }
 
-  getStaticGroup() : Phaser.Physics.Arcade.StaticGroup {
+  getPhysicsGroup() : Phaser.Physics.Arcade.Group {
     return this.group;
   }
 

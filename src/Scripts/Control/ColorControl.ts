@@ -31,7 +31,7 @@ export default class ColorControl implements ColorGenerator{
   }
 
   generateColor() : number{
-    return this.colors[Random.getRandomInteger(0, this.colors.length-3)];
+    return this.colors[Random.getRandomInteger(0, this.colors.length)];
   }
 
 }

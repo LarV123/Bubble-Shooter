@@ -22,6 +22,9 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
   private colorControl : ColorControl;
 
+  private isKeyDown : boolean = false;
+  private keySpace : Phaser.Input.Keyboard.Key;
+
   constructor() {
     super({ key: "GameScene" });
   }
@@ -41,6 +44,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer());
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
+
+    this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   private createStaticBubbleFactory() : StaticBubbleFactory {
@@ -74,10 +79,14 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
       this.shootControl.shoot();
     }
     this.isLastDown = this.input.activePointer.isDown;
+    if(!this.isKeyDown && this.keySpace.isDown){
+      this.bubbleBoard.shiftDown();
+    }
+    this.isKeyDown = this.keySpace.isDown;
   }
 
   onBubbleCreated(bubble: DynamicBubble): void {
-    this.physics.add.collider(bubble, this.bubbleBoard.getStaticGroup(), this.onBallCollision, null, this);
+    this.physics.add.collider(bubble, this.bubbleBoard.getPhysicsGroup(), this.onBallCollision, null, this);
   }
 
   private onBallCollision(obj1 : Phaser.GameObjects.GameObject, obj2 : Phaser.GameObjects.GameObject){

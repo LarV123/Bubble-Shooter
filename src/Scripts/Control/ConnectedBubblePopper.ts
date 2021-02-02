@@ -28,8 +28,6 @@ export default class ConnectedBubblePopper implements BubblePopper{
     this.bubbleBoard.cleanBubbleBoard();
   }
 
-  private neighbourCellOdd : number[][] = [[1, -1], [1, 0], [1, 1], [0, 1], [-1, 0], [0, -1]];
-  private neighbourCellEven : number[][] = [[-1, -1], [0, -1], [1, 0], [0, 1], [-1, 1], [-1, 0]];
   private popCheck(indexX : number, indexY : number) : void{
     if(this.bubbleBoard.isOutOfBound(indexX, indexY)){
       return;
@@ -41,15 +39,10 @@ export default class ConnectedBubblePopper implements BubblePopper{
     }
     this.bubbleList.push(currentBubble);
     this.popList.push(new PopData(indexX, indexY));
-    if(indexY % 2 == 0){
-      this.neighbourCellEven.forEach(offset => {
-        this.popCheck(indexX + offset[0], indexY + offset[1]);
-      });
-    }else{
-      this.neighbourCellOdd.forEach(offset => {
-        this.popCheck(indexX + offset[0], indexY + offset[1]);
-      });
-    }
+    let neighbourCell : number[][] = this.bubbleBoard.getNeighbourCell(indexX, indexY);
+    neighbourCell.forEach(offset => {
+      this.popCheck(indexX + offset[0], indexY + offset[1]);
+    });
   }
 
 }
