@@ -7,4 +7,8 @@ export default class Pointer extends Phaser.GameObjects.Image{
     scene.add.existing(this);
   }
 
+  getAimAngle() : number{
+    return this.rotation-Math.PI/2;
+  }
+
 }

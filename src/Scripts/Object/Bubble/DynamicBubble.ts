@@ -18,12 +18,18 @@ export default class DynamicBubble extends Bubble {
   }
 
   shoot(angle : number) : this{
+    this.scene.sound.play("bubble_shoot");
     let direction : Phaser.Math.Vector2 = Phaser.Math.Vector2.ONE;
     direction.setAngle(angle);
     direction.normalize();
 
     this.setVelocity(direction.x * this.speed, direction.y * this.speed);
     return this;
+  }
+
+  destroy() : void{
+    this.scene.sound.play("bubble_shoot");
+    super.destroy();
   }
 
   attach() : this{

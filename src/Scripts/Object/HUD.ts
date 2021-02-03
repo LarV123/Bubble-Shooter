@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import ColorControl from "../Control/ColorControl";
+import ProgressBox from "./ProgressBox";
 
 export default class HUD extends Phaser.GameObjects.GameObject{
 
@@ -12,27 +13,40 @@ export default class HUD extends Phaser.GameObjects.GameObject{
 
   private nextBallText : Phaser.GameObjects.Text;
 
+  private progressBox : ProgressBox;
+
   constructor(scene : Phaser.Scene, colorControl : ColorControl){
     super(scene, "HUD");
     this.colorControl = colorControl;
     this.scene.add.rectangle(scene.cameras.main.centerX, scene.cameras.main.height - this.height/2, scene.cameras.main.width, this.height, 0xa5a5a5);
-    this.nextBallUI = this.scene.add.image(scene.cameras.main.centerX + 300, scene.cameras.main.height - this.height/2 - 30, "bubble");
+    this.nextBallUI = this.scene.add.image(scene.cameras.main.centerX + 300, scene.cameras.main.height - this.height/2, "bubble");
     this.nextBallUI.setScale(0.5);
     this.nextBallUI.setTint(this.colorControl.getNextColor());
 
-    this.scoreUI = this.scene.add.text(20, this.scene.cameras.main.height-130, "Score : 0", {fontSize:"36px", color:"#000000"});
-    this.nextBallText = this.scene.add.text(400, this.scene.cameras.main.height-120, "Next Ball", {fontSize:"36px", color:"#000000"});
+    this.scoreUI = this.scene.add.text(20, this.scene.cameras.main.height-100, "Score : 0", {fontSize:"36px", color:"#000000"});
+    this.nextBallText = this.scene.add.text(400, this.scene.cameras.main.height-90, "Next Ball", {fontSize:"36px", color:"#000000"});
+
+    this.progressBox = new ProgressBox(scene, scene.cameras.main.centerX, scene.cameras.main.height-this.height+10, scene.cameras.main.width, 20, 0xffffff, 0x000000);
   }
 
   setScore(score : number){
     this.scoreUI.setText("Score : "+score);
   }
 
+  setProgress(progress : number){
+    this.progressBox.setProgress(progress);
+  }
+
+
   update() : void{
     this.nextBallUI.setTint(this.colorControl.getNextColor());
+    this.progressBox.update();
   }
 
   destroy() : void{
+    this.nextBallUI.destroy();
+    this.scoreUI.destroy();
+    this.nextBallText.destroy();
     super.destroy();
   }
 

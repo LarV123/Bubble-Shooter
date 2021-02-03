@@ -18,6 +18,7 @@ export default class StaticBubble extends Bubble{
   }
 
   pop() : void{
+    this.scene.sound.play("bubble_pop");
     ScoreSystem.getInstance().addScore(10);
     this.endAnim = this.scene.add.sprite(this.x, this.y, "bubble").setScale(this.scaleX).setTint(this.getColor()).play("bubble_pop").on("animationcomplete", this.popAnimationComplete, this);
     this.destroy();

@@ -31,6 +31,10 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
   private trajectoryPredictor : TrajectoryPredictor;
 
+  private pointer : Pointer;
+
+  private bubbleBoardShiftTimedEvent : Phaser.Time.TimerEvent;
+
   constructor() {
     super({ key: "GameScene" });
   }
@@ -50,14 +54,19 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.colorControl = new ColorControl(this.bubbleBoard);
 
     this.hud = new HUD(this, this.colorControl);
+    
+    this.pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
+    this.pointer.setDisplayOrigin(this.pointer.width/2, this.pointer.height/2 + 100)
 
-    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.createPointer());
+    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.pointer);
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
 
     this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.trajectoryPredictor = new TrajectoryPredictor(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.bubbleBoard);
+    this.trajectoryPredictor = new TrajectoryPredictor(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.bubbleBoard, this.pointer);
+
+    this.bubbleBoardShiftTimedEvent = this.time.addEvent({delay:10000, loop:true, callback:()=>{this.bubbleBoard.shiftDown()}, callbackScope:this});
 
   }
 
@@ -72,13 +81,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     return bubbleSpawner;
   }
 
-  private createPointer() : Pointer {
-    let pointer : Pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
-    pointer.setDisplayOrigin(pointer.width/2, pointer.height/2 + 100)
-    return pointer;
-  }
-
   private onWorldBound(body : Phaser.Physics.Arcade.Body, topCollision : boolean) : void{
+    this.sound.play("bubble_bounce", {volume:0.3, detune:100});
     if(topCollision && body.gameObject instanceof DynamicBubble){
       let bubble : DynamicBubble = (body.gameObject as DynamicBubble);
       this.bubbleBoard.attach(bubble);
@@ -86,6 +90,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   update(): void {
+    this.hud.setProgress(this.bubbleBoardShiftTimedEvent.getProgress());
     this.trajectoryPredictor.update();
     this.hud.update();
     this.hud.setScore(ScoreSystem.getInstance().getScore());

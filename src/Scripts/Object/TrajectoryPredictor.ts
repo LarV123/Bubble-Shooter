@@ -1,5 +1,8 @@
 import * as Phaser from "phaser";
 import BubbleBoard from "./BubbleBoard";
+import { BUBBLE_RADIUS } from "./Bubble/Bubble";
+import Pointer from "./Pointer";
+import DashedLine from "./DashedLine";
 
 export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
 
@@ -12,37 +15,39 @@ export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
   private leftBound : Phaser.Geom.Line;
   private rightBound : Phaser.Geom.Line;
   private lines : Phaser.Geom.Line[];
-  private maxLines = 10;
+  private dashedLine : DashedLine[];
+  private maxReflection = 10;
 
   private bubbleShapeList : Phaser.Geom.Circle;
 
+  private pointer : Pointer;
+
   private bubbleBoard : BubbleBoard;
 
-  constructor(scene : Phaser.Scene, startX : number, startY : number, bubbleBoard : BubbleBoard){
-    super(scene, { lineStyle: { width: 4, color: 0xaa00aa, }});
+  constructor(scene : Phaser.Scene, startX : number, startY : number, bubbleBoard : BubbleBoard, pointer : Pointer){
+    super(scene, { lineStyle: { width: 4, color: 0x0000aa}});
     scene.add.existing(this);
     this.bubbleBoard = bubbleBoard;
     this.startX = startX;
     this.startY = startY;
+    this.pointer = pointer;
+    this.leftBound = new Phaser.Geom.Line(BUBBLE_RADIUS,0,BUBBLE_RADIUS, this.scene.cameras.main.height);
+    this.rightBound = new Phaser.Geom.Line(this.scene.cameras.main.width-BUBBLE_RADIUS,0,this.scene.cameras.main.width-BUBBLE_RADIUS, this.scene.cameras.main.height);
 
-    this.leftBound = new Phaser.Geom.Line(30,0,30, this.scene.cameras.main.height);
-    this.rightBound = new Phaser.Geom.Line(this.scene.cameras.main.width-30,0,this.scene.cameras.main.width-30, this.scene.cameras.main.height);
-
+    this.dashedLine = [];
     this.lines = [];
-    for(let i = 0; i < this.maxLines; i++){
+    for(let i = 0; i < this.maxReflection; i++){
       this.lines.push(new Phaser.Geom.Line(0,0,0,0));
+      this.dashedLine.push(new DashedLine(scene, 0, 0, 0, 0, 0xffffff, 20, 20, 10));
     }
   }
 
-  onPointerMove(pointer){
+  onPointerMove(){
 
-    let dirVector = new Phaser.Math.Vector2(pointer.x - this.startX, pointer.y - this.startY);
+    let dirVector = new Phaser.Math.Vector2(Math.cos(this.pointer.getAimAngle()), Math.sin(this.pointer.getAimAngle()));
     dirVector = dirVector.normalize();
-
-    this.lines[0].x1 = this.startX + dirVector.x * this.offsetFromStartingLength;
-    this.lines[0].y1 = this.startY + dirVector.y * this.offsetFromStartingLength;
-    this.lines[0].x2 = this.lines[0].x1 + dirVector.x * this.maxLength;
-    this.lines[0].y2 = this.lines[0].y1 + dirVector.y * this.maxLength;
+    
+    Phaser.Geom.Line.SetToAngle(this.lines[0], this.startX + dirVector.x * this.offsetFromStartingLength, this.startY + dirVector.y * this.offsetFromStartingLength, this.pointer.getAimAngle(), this.maxLength);
   }
 
   private checkBubbleIntersection(line : Phaser.Geom.Line) : any {
@@ -80,7 +85,7 @@ export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
       this.lines[index].y2 = bubbleIntersect.y;
       return 0;
     }
-    if(index >= this.maxLines-1) return 0;
+    if(index >= this.maxReflection-1) return 0;
     let intersectionPoint;
     let reflectAngle;
     if(Phaser.Geom.Intersects.LineToLine(this.lines[index], this.leftBound)){
@@ -102,24 +107,23 @@ export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
 
   update() : void{
 
-    this.onPointerMove({x : this.scene.input.x, y: this.scene.input.y});
+    this.onPointerMove();
 
     let reflectionCount = this.traceReflection(0);
 
-    this.clear();
-    // for (let i = this.bubbleBoard.getBubbleBoard().length-1; i >= 0; i--) {
-    //   const element = this.bubbleBoard.getBubbleBoard()[i];
-
-    //   for (let j = 0; j < element.length; j++) {
-    //     const bubble = element[j];
-    //     if(bubble){
-    //       let shape = bubble.getCircleShape();
-    //       this.strokeCircleShape(shape);
-    //     }
-    //   }
-    // }
     for(let i = 0; i < 1 + reflectionCount; i++){
-      this.strokeLineShape(this.lines[i]);
+      this.dashedLine[i].x1 = this.lines[i].x1;
+      this.dashedLine[i].y1 = this.lines[i].y1;
+      this.dashedLine[i].x2 = this.lines[i].x2;
+      this.dashedLine[i].y2 = this.lines[i].y2;
+    }
+
+    for(let i = 0; i < this.dashedLine.length; i++){
+      this.dashedLine[i].clear();
+    }
+
+    for(let i = 0; i < 1+reflectionCount; i++){
+      this.dashedLine[i].draw();
     }
   }
 
