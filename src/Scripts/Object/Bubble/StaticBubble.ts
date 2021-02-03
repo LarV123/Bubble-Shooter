@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import Bubble from "./Bubble";
+import ScoreSystem from "../../Control/ScoreSystem";
 
 export default class StaticBubble extends Bubble{
 
@@ -17,11 +18,13 @@ export default class StaticBubble extends Bubble{
   }
 
   pop() : void{
+    ScoreSystem.getInstance().addScore(10);
     this.endAnim = this.scene.add.sprite(this.x, this.y, "bubble").setScale(this.scaleX).setTint(this.getColor()).play("bubble_pop").on("animationcomplete", this.popAnimationComplete, this);
     this.destroy();
   }
 
   fall() : void{
+    ScoreSystem.getInstance().addScore(20);
     this.endAnim = this.scene.physics.add.sprite(this.x, this.y, "bubble").setScale(this.scaleX).setTint(this.getColor()).setGravityY(1000);
     this.scene.tweens.add({
       targets: this.endAnim,
@@ -35,6 +38,10 @@ export default class StaticBubble extends Bubble{
 
   popAnimationComplete() : void{
     this.endAnim.destroy();
+  }
+
+  getCircleShape() : Phaser.Geom.Circle{
+    return new Phaser.Geom.Circle(this.x, this.y, this.displayWidth/2);
   }
 
 }

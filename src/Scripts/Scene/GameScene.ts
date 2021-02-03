@@ -10,7 +10,9 @@ import ColorControl from "../Control/ColorControl";
 import ColorRandomizer from "../Control/ColorRandomizer";
 import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
 import StaticBubbleCreator from "../Control/StaticBubbleCreator";
+import TrajectoryPredictor from "../Object/TrajectoryPredictor";
 import HUD from "../Object/HUD";
+import ScoreSystem from "../Control/ScoreSystem";
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -27,6 +29,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
   private hud : HUD;
 
+  private trajectoryPredictor : TrajectoryPredictor;
+
   constructor() {
     super({ key: "GameScene" });
   }
@@ -36,6 +40,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   create(): void {
+
+    ScoreSystem.getInstance().reset();
 
     this.ballSpawnPoint = new Phaser.Math.Vector2(this.cameras.main.centerX, this.cameras.main.height-200);
 
@@ -50,6 +56,9 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.physics.world.on("worldbounds", this.onWorldBound, this);
 
     this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+    this.trajectoryPredictor = new TrajectoryPredictor(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.bubbleBoard);
+
   }
 
   private createStaticBubbleFactory() : StaticBubbleFactory {
@@ -77,7 +86,9 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   }
 
   update(): void {
+    this.trajectoryPredictor.update();
     this.hud.update();
+    this.hud.setScore(ScoreSystem.getInstance().getScore());
     this.shootControl.update(this.input.x, this.input.y);
     if(!this.isLastDown && this.input.activePointer.isDown){
       this.shootControl.shoot();
