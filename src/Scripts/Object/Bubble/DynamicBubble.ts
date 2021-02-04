@@ -26,10 +26,10 @@ export default class DynamicBubble extends Bubble {
     this.setVelocity(direction.x * this.speed, direction.y * this.speed);
     return this;
   }
-
-  destroy() : void{
+  
+  pop() : void{
     this.scene.sound.play("bubble_shoot");
-    super.destroy();
+    this.destroy();
   }
 
   attach() : this{

@@ -13,6 +13,7 @@ import StaticBubbleCreator from "../Control/StaticBubbleCreator";
 import TrajectoryPredictor from "../Object/TrajectoryPredictor";
 import HUD from "../Object/HUD";
 import ScoreSystem from "../Control/ScoreSystem";
+import GameOverHandler from "../Control/GameOverHandler";
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -22,16 +23,13 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
   private shootControl : ShootControl;
   private colorControl : ColorControl;
 
-  private isLastDown : boolean = false;
-
-  private isKeyDown : boolean = false;
-  private keySpace : Phaser.Input.Keyboard.Key;
-
   private hud : HUD;
 
   private trajectoryPredictor : TrajectoryPredictor;
 
   private pointer : Pointer;
+
+  private gameOverHandler : GameOverHandler;
 
   private bubbleBoardShiftTimedEvent : Phaser.Time.TimerEvent;
 
@@ -58,15 +56,15 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
     this.pointer.setDisplayOrigin(this.pointer.width/2, this.pointer.height/2 + 100)
 
-    this.shootControl = new ShootControl(this.createDynamicBubbleFactory(), this.pointer);
+    this.shootControl = new ShootControl(this.input, this.createDynamicBubbleFactory(), this.pointer);
 
     this.physics.world.on("worldbounds", this.onWorldBound, this);
-
-    this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this.trajectoryPredictor = new TrajectoryPredictor(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y, this.bubbleBoard, this.pointer);
 
     this.bubbleBoardShiftTimedEvent = this.time.addEvent({delay:10000, loop:true, callback:()=>{this.bubbleBoard.shiftDown()}, callbackScope:this});
+
+    this.gameOverHandler = new GameOverHandler(this, this.bubbleBoard, this.bubbleBoardShiftTimedEvent, [this.shootControl]);
 
   }
 
@@ -94,15 +92,8 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.trajectoryPredictor.update();
     this.hud.update();
     this.hud.setScore(ScoreSystem.getInstance().getScore());
-    this.shootControl.update(this.input.x, this.input.y);
-    if(!this.isLastDown && this.input.activePointer.isDown){
-      this.shootControl.shoot();
-    }
-    this.isLastDown = this.input.activePointer.isDown;
-    if(!this.isKeyDown && this.keySpace.isDown){
-      this.bubbleBoard.shiftDown();
-    }
-    this.isKeyDown = this.keySpace.isDown;
+    this.shootControl.update();=
+    this.gameOverHandler.update();
   }
 
   onBubbleCreated(bubble: DynamicBubble): void {

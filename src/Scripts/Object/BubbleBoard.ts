@@ -53,7 +53,6 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
       }
     }
     this.generateRowOfBubble(0);
-    this.printBoard();
   }
 
   attach(bubble : DynamicBubble){
@@ -62,8 +61,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
     let posX : number = this.calculatePosX(indexX, indexY);
     let posY : number = this.calculatePosY(indexY);
     this.insert(new StaticBubble(this.scene, posX, posY, bubble.getColor()), indexX, indexY);
-    this.printBoard();
-    bubble.destroy();
+    bubble.pop();
     this.sameColorPopper.pop(indexX, indexY);
   }
 
