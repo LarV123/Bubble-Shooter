@@ -92,7 +92,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.trajectoryPredictor.update();
     this.hud.update();
     this.hud.setScore(ScoreSystem.getInstance().getScore());
-    this.shootControl.update();=
+    this.shootControl.update();
     this.gameOverHandler.update();
   }
 

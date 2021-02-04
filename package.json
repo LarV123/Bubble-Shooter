@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "start": "node app.js",
     "dev": "webpack --watch",
-    "serve" : "live-server --port=8085"
+    "serve": "live-server --port=8085"
   },
   "repository": {
     "type": "git",
