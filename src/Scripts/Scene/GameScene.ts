@@ -57,7 +57,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.physics.world.setBounds(GameScreen.getInstance().getRelativePosX(0), GameScreen.getInstance().getRelativePosY(0),
     GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT));
 
-    this.ballSpawnPoint = new Phaser.Math.Vector2(GameScreen.getInstance().getRelativePosX(this.cameras.main.centerX), GameScreen.getInstance().getRelativePosY(this.cameras.main.height-200));
+    this.ballSpawnPoint = new Phaser.Math.Vector2(GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH/2), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT-200));
     
     this.colorControl = new ColorControl(this.bubbleBoard);
 
