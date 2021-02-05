@@ -168,7 +168,7 @@ export default class BubbleBoard extends Phaser.GameObjects.Graphics{
   }
 
   private getIndexX(indexY : number, bubble : DynamicBubble) : number{
-    bubble.x-=this.x-this.height/2;
+    bubble.x-=this.x-this.width/2;
     if(this.arrayLength[indexY%2] == 7){
       bubble.x -= bubble.body.width/2;
     }
@@ -176,7 +176,7 @@ export default class BubbleBoard extends Phaser.GameObjects.Graphics{
   }
 
   private getIndexY(bubble : DynamicBubble) : number{
-    bubble.x-=this.y-this.width/2;
+    bubble.y-=this.y-this.height/2;
     return Math.floor(bubble.y / (bubble.body.height * Math.sqrt(3/4)));
   }
 

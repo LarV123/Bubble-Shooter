@@ -3,6 +3,8 @@ import BubbleBoard from "./BubbleBoard";
 import { BUBBLE_RADIUS } from "./Bubble/Bubble";
 import Pointer from "./Pointer";
 import DashedLine from "./DashedLine";
+import * as Constant from "../Util/Constant";
+import GameScreen from "./GameScreen";
 
 export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
 
@@ -31,14 +33,16 @@ export default class TrajectoryPredictor extends Phaser.GameObjects.Graphics{
     this.startX = startX;
     this.startY = startY;
     this.pointer = pointer;
-    this.leftBound = new Phaser.Geom.Line(BUBBLE_RADIUS,0,BUBBLE_RADIUS, this.scene.cameras.main.height);
-    this.rightBound = new Phaser.Geom.Line(this.scene.cameras.main.width-BUBBLE_RADIUS,0,this.scene.cameras.main.width-BUBBLE_RADIUS, this.scene.cameras.main.height);
-
+    this.leftBound = new Phaser.Geom.Line(GameScreen.getInstance().getRelativePosX(BUBBLE_RADIUS),GameScreen.getInstance().getRelativePosY(0),
+    GameScreen.getInstance().getRelativePosX(BUBBLE_RADIUS), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT));
+    this.rightBound = new Phaser.Geom.Line(GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH-BUBBLE_RADIUS),GameScreen.getInstance().getRelativePosY(0),
+    GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH-BUBBLE_RADIUS), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT));
+    this.offsetFromStartingLength = GameScreen.getInstance().resize(this.offsetFromStartingLength);
     this.dashedLine = [];
     this.lines = [];
     for(let i = 0; i < this.maxReflection; i++){
       this.lines.push(new Phaser.Geom.Line(0,0,0,0));
-      this.dashedLine.push(new DashedLine(scene, 0, 0, 0, 0, 0xffffff, 20, 20, 10));
+      this.dashedLine.push(new DashedLine(scene, 0, 0, 0, 0, 0xffffff, GameScreen.getInstance().resize(20), GameScreen.getInstance().resize(20), GameScreen.getInstance().resize(10)));
     }
   }
 

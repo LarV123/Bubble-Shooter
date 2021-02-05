@@ -6,10 +6,10 @@ export const getResolution = () => {
       }
       let w = 720;
       let h = 1200;
-      if (isMobile !== -1) {
+      // if (isMobile !== -1) {
           w = window.innerWidth;
           h = window.innerHeight;
-      }
+      // }
   
     return { width: w, height: h };
   };

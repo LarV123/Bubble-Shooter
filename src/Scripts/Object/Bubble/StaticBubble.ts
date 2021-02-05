@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import Bubble from "./Bubble";
 import ScoreSystem from "../../Control/ScoreSystem";
+import GameScreen from "../GameScreen";
 
 export default class StaticBubble extends Bubble{
 
@@ -11,7 +12,7 @@ export default class StaticBubble extends Bubble{
 
     scene.physics.add.existing(this);
 
-    let resize : number = 20;
+    let resize : number = GameScreen.getInstance().resize(10);
     this.setCircle(this.displayWidth/2 - resize/2);
     this.setOffset(this.displayWidth/2 - resize);
     this.on("animationcomplete", this.popAnimationComplete, this);

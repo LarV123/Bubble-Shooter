@@ -16,6 +16,7 @@ import ScoreSystem from "../Control/ScoreSystem";
 import GameOverHandler from "../Control/GameOverHandler";
 import * as Constant from "../Util/Constant";
 import GameScreen from "../Object/GameScreen";
+import AlignTool from "../Util/AlignTool";
 
 const DEFAULT_SPAWN_POS_X = Constant.DEFAULT_WIDTH/2;
 const DEFAULT_SPAWN_POS_Y = Constant.DEFAULT_HEIGHT-200;
@@ -55,7 +56,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.bubbleBoard = new BubbleBoard(this, this.createStaticBubbleFactory());
 
     this.physics.world.setBounds(GameScreen.getInstance().getRelativePosX(0), GameScreen.getInstance().getRelativePosY(0),
-    GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT));
+    GameScreen.getInstance().resizeX(Constant.DEFAULT_WIDTH), GameScreen.getInstance().resizeY(Constant.DEFAULT_HEIGHT));
 
     this.ballSpawnPoint = new Phaser.Math.Vector2(GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH/2), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT-200));
     
@@ -64,7 +65,9 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.hud = new HUD(this, this.colorControl);
     
     this.pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
-    this.pointer.setDisplayOrigin(GameScreen.getInstance().resizeX(this.pointer.width/2), GameScreen.getInstance().resizeY(this.pointer.height/2 + 100));
+    this.pointer.displayWidth = GameScreen.getInstance().resizeX(this.pointer.displayWidth);
+    this.pointer.displayHeight = GameScreen.getInstance().resizeY(this.pointer.displayHeight);
+    this.pointer.setDisplayOrigin(this.pointer.width/2, this.pointer.height/2 + 100);
 
     this.shootControl = new ShootControl(this.input, this.createDynamicBubbleFactory(), this.pointer);
 

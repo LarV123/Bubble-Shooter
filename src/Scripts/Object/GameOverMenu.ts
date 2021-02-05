@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 import GameOverHandler from "../Control/GameOverHandler";
 import Activable from "../Interfaces/Activable";
+import GameScreen from "./GameScreen";
 import ImageButton from "./ImageButton";
 
 export default class GameOverMenu extends Phaser.GameObjects.GameObject implements Activable{
@@ -17,12 +18,13 @@ export default class GameOverMenu extends Phaser.GameObjects.GameObject implemen
     this.graphics = scene.add.graphics();
     this.replayButton = new ImageButton(scene, scene.cameras.main.centerX, scene.cameras.main.centerY, "replay");
     this.replayButton.setVisible(false);
-    this.replayButton.setScale(0.8);
+    this.replayButton.displayWidth = GameScreen.getInstance().resizeX(200);
+    this.replayButton.displayHeight = GameScreen.getInstance().resizeY(200);
     this.replayButton.depth = 101;
     this.replayButton.on("click", ()=>{this.gameOverHandler.restart()}, this);
     this.active = false;
 
-    this.gameOverText = this.scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 200, "GAME OVER", {fontSize:"72px", fontFamily:"Arial", color:"#ffffff"}).setOrigin(0.5);
+    this.gameOverText = this.scene.add.text(scene.cameras.main.centerX, scene.cameras.main.centerY - 200, "GAME OVER", {fontSize:""+GameScreen.getInstance().resize(72)+"px", fontFamily:"Arial", color:"#ffffff"}).setOrigin(0.5);
     this.gameOverText.setVisible(false);
 
     this.gameOverText.depth = 101;
