@@ -13,7 +13,7 @@ export default class StaticBubble extends Bubble{
     scene.physics.add.existing(this);
 
     this.setCircle(40);
-    this.setOffset(20);
+    this.body.setOffset(20, 20);
     this.on("animationcomplete", this.popAnimationComplete, this);
   }
 
