@@ -1,4 +1,5 @@
 import * as Phaser from "phaser";
+import GameScreen from "../GameScreen";
 
 export const BUBBLE_RADIUS = 45;
 
@@ -13,7 +14,7 @@ export default class Bubble extends Phaser.Physics.Arcade.Sprite{
 
     this.setTint(color);
     this.color = color;
-    this.setScale(BUBBLE_RADIUS * 2/ this.width);
+    this.setScale(GameScreen.getInstance().resize(BUBBLE_RADIUS) * 2/ this.width);
 
   }
 

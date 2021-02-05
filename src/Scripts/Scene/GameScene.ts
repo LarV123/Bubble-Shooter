@@ -14,6 +14,11 @@ import TrajectoryPredictor from "../Object/TrajectoryPredictor";
 import HUD from "../Object/HUD";
 import ScoreSystem from "../Control/ScoreSystem";
 import GameOverHandler from "../Control/GameOverHandler";
+import * as Constant from "../Util/Constant";
+import GameScreen from "../Object/GameScreen";
+
+const DEFAULT_SPAWN_POS_X = Constant.DEFAULT_WIDTH/2;
+const DEFAULT_SPAWN_POS_Y = Constant.DEFAULT_HEIGHT-200;
 
 export default class GameScene extends Phaser.Scene implements BubbleCreatedCallback{
 
@@ -43,18 +48,23 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
 
   create(): void {
 
+    GameScreen.createInstance(this, this.cameras.main.centerX, this.cameras.main.centerY);
+
     ScoreSystem.getInstance().reset();
 
-    this.ballSpawnPoint = new Phaser.Math.Vector2(this.cameras.main.centerX, this.cameras.main.height-200);
-
     this.bubbleBoard = new BubbleBoard(this, this.createStaticBubbleFactory());
+
+    this.physics.world.setBounds(GameScreen.getInstance().getRelativePosX(0), GameScreen.getInstance().getRelativePosY(0),
+    GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH), GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT));
+
+    this.ballSpawnPoint = new Phaser.Math.Vector2(GameScreen.getInstance().getRelativePosX(this.cameras.main.centerX), GameScreen.getInstance().getRelativePosY(this.cameras.main.height-200));
     
     this.colorControl = new ColorControl(this.bubbleBoard);
 
     this.hud = new HUD(this, this.colorControl);
     
     this.pointer = new Pointer(this, this.ballSpawnPoint.x, this.ballSpawnPoint.y);
-    this.pointer.setDisplayOrigin(this.pointer.width/2, this.pointer.height/2 + 100)
+    this.pointer.setDisplayOrigin(GameScreen.getInstance().resizeX(this.pointer.width/2), GameScreen.getInstance().resizeY(this.pointer.height/2 + 100));
 
     this.shootControl = new ShootControl(this.input, this.createDynamicBubbleFactory(), this.pointer);
 
@@ -94,6 +104,7 @@ export default class GameScene extends Phaser.Scene implements BubbleCreatedCall
     this.hud.setScore(ScoreSystem.getInstance().getScore());
     this.shootControl.update();
     this.gameOverHandler.update();
+    this.bubbleBoard.update();
   }
 
   onBubbleCreated(bubble: DynamicBubble): void {

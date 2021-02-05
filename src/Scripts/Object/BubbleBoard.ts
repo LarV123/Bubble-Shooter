@@ -6,8 +6,10 @@ import StaticBubbleFactory from "../Interfaces/StaticBubbleFactory";
 import ConnectedColorBubblePopper from "../Control/ConnectedColorBubblePopper";
 import BubblePopper from "../Interfaces/BubblePopper";
 import HangingBubbleCleaner from "../Control/HangingBubbleCleaner";
+import GameScreen from "../Object/GameScreen";
+import * as Constant from "../Util/Constant";
 
-export default class BubbleBoard extends Phaser.GameObjects.GameObject{
+export default class BubbleBoard extends Phaser.GameObjects.Graphics{
 
   private group : Phaser.Physics.Arcade.Group;
 
@@ -22,11 +24,25 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   private sameColorPopper : BubblePopper;
   private hangingBubbleCleaner : HangingBubbleCleaner;
 
+  public static DEFAULT_WIDTH : number = 720;
+  public static DEFAULT_HEIGHT : number = 1200;
+
+  private width : number;
+  private height : number;
+
   constructor(scene : Phaser.Scene, staticBubbleFactory : StaticBubbleFactory){
-    super(scene, "Bubble Board");
+    super(scene);
     scene.add.existing(this);
     this.bubbleBoard = [];
     this.staticBubbleFactory = staticBubbleFactory;
+
+    this.x = GameScreen.getInstance().getRelativePosX(Constant.DEFAULT_WIDTH/2);
+    this.y = GameScreen.getInstance().getRelativePosY(Constant.DEFAULT_HEIGHT/2);
+
+    this.depth = 1000;
+    this.width = GameScreen.getInstance().resizeX(BubbleBoard.DEFAULT_WIDTH);
+    this.height = GameScreen.getInstance().resizeY(BubbleBoard.DEFAULT_HEIGHT);
+    // this.calculateResponsiveness();
 
     this.arrayLength = [7, 8];
 
@@ -152,6 +168,7 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   }
 
   private getIndexX(indexY : number, bubble : DynamicBubble) : number{
+    bubble.x-=this.x-this.height/2;
     if(this.arrayLength[indexY%2] == 7){
       bubble.x -= bubble.body.width/2;
     }
@@ -159,19 +176,22 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
   }
 
   private getIndexY(bubble : DynamicBubble) : number{
+    bubble.x-=this.y-this.width/2;
     return Math.floor(bubble.y / (bubble.body.height * Math.sqrt(3/4)));
   }
 
   private calculatePosX(indexX : number, indexY : number) : number{
+    let bubbleSize = GameScreen.getInstance().resize(BUBBLE_RADIUS);
     if(this.arrayLength[indexY % 2] == 8){
-      return BUBBLE_RADIUS + indexX * BUBBLE_RADIUS * 2;
+      return (this.x-this.width/2) + bubbleSize + indexX * bubbleSize * 2;
     }else{
-      return BUBBLE_RADIUS * 2 + indexX * BUBBLE_RADIUS * 2;
+      return (this.x-this.width/2) + bubbleSize * 2 + indexX * bubbleSize * 2;
     }
   }
 
   private calculatePosY(indexY : number) : number{
-    return BUBBLE_RADIUS + indexY * BUBBLE_RADIUS * 2 * Math.sqrt(3/4);
+    let bubbleSize = GameScreen.getInstance().resize(BUBBLE_RADIUS);
+    return (this.y-this.height/2) + bubbleSize + indexY * bubbleSize * 2 * Math.sqrt(3/4);
   }
 
   private printBoard() :void{
@@ -197,12 +217,29 @@ export default class BubbleBoard extends Phaser.GameObjects.GameObject{
 
   //#endregion
 
+  update() : void{
+    this.clear();
+    this.lineStyle(8, 0x000000, 1.0);
+    this.lineBetween(-this.width/2, this.height/2, this.width/2, this.height/2);
+    this.lineBetween(this.width/2, this.height/2, this.width/2, -this.height/2);
+    this.lineBetween(this.width/2, -this.height/2, -this.width/2, -this.height/2);
+    this.lineBetween(-this.width/2, -this.height/2, -this.width/2, this.height/2);
+  }
+
   getPhysicsGroup() : Phaser.Physics.Arcade.Group {
     return this.group;
   }
 
   getBubbleBoard() : ReadonlyArray<ReadonlyArray<StaticBubble>> {
     return this.bubbleBoard;
+  }
+
+  getWidth() : number {
+    return this.width;
+  }
+
+  getHeight() : number {
+    return this.height;
   }
 
 }
