@@ -12,9 +12,8 @@ export default class StaticBubble extends Bubble{
 
     scene.physics.add.existing(this);
 
-    let resize : number = 10
-    this.setCircle(this.displayWidth/2 - resize/2);
-    this.setOffset(0);
+    this.setCircle(40);
+    this.setOffset(20);
     this.on("animationcomplete", this.popAnimationComplete, this);
   }
 
