@@ -12,9 +12,9 @@ export default class StaticBubble extends Bubble{
 
     scene.physics.add.existing(this);
 
-    let resize : number = GameScreen.getInstance().resize(10);
+    let resize : number = 10
     this.setCircle(this.displayWidth/2 - resize/2);
-    this.setOffset(this.displayWidth/2 - resize);
+    this.setOffset(0);
     this.on("animationcomplete", this.popAnimationComplete, this);
   }
 
